@@ -1,0 +1,7 @@
+.ccsproject
+.launches/
+.settings/
+targetConfigs/
+Release*/
+Debug*/
+Log/

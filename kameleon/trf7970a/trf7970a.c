@@ -1,0 +1,120 @@
+/*  Benjamin DELPY `gentilkiwi`
+    https://blog.gentilkiwi.com
+    benjamin@gentilkiwi.com
+    Licence : https://creativecommons.org/licenses/by/4.0/
+*/
+#include "trf7970a.h"
+
+void TRF7970A_init()
+{
+    TRF_CS_DISABLE(); // just in case
+
+    TRF_DISABLE();
+    TIMER_delay_Milliseconds(10);
+    TRF_ENABLE();
+    TIMER_delay_Milliseconds(10);
+    // 6.11 TRF7970A Initialization
+    TRF7970A_SPI_DirectCommand(TRF79X0_SOFT_INIT_CMD);
+    TRF7970A_SPI_DirectCommand(TRF79X0_IDLE_CMD);
+    TIMER_delay_Milliseconds(1);
+    TRF7970A_SPI_DirectCommand(TRF79X0_RESET_FIFO_CMD);
+    TRF7970A_SPI_Write_SingleRegister_internal(TRF79X0_CHIP_STATUS_CTRL_REG, 0x00);
+    TRF7970A_clearIrqStatus();
+
+    TRF_IRQ_ENABLE();
+}
+
+void TRF7970A_SPI_Send_raw(const uint8_t *pcbData, uint8_t cbData)
+{
+    TRF_CS_ENABLE();
+    while(cbData > 0)
+    {
+        TRF_SPI_SEND(*pcbData);
+        pcbData++;
+        cbData--;
+    }
+    TRF_CS_DISABLE();
+}
+
+void TRF7970A_SPI_DirectCommand_internal(uint8_t CommandCode_Preparred) // be careful, optimization make multiple direct commands too fast, a cycle between can help...
+{
+    TRF_CS_ENABLE();
+    TRF_SPI_SEND(CommandCode_Preparred);
+    TRF_CS_DISABLE();
+}
+
+uint8_t TRF7970A_SPI_Read_SingleRegister_internal(uint8_t Register_Prepared)
+{
+    uint8_t res;
+
+    TRF_CS_ENABLE();
+    TRF_SPI_SEND(Register_Prepared);
+    TRF_SPI_RECV(res);
+    TRF_CS_DISABLE();
+
+    return res;
+}
+
+void TRF7970A_SPI_Write_SingleRegister_internal(uint8_t Register_Prepared, const uint8_t Value)
+{
+    TRF_CS_ENABLE();
+    TRF_SPI_SEND(Register_Prepared);
+    TRF_SPI_SEND(Value);
+    TRF_CS_DISABLE();
+}
+
+
+void TRF7970A_SPI_Read_ContinuousRegister_internal(uint8_t Register_Prepared, uint8_t *pbData, uint8_t cbData)
+{
+    TRF_CS_ENABLE();
+    TRF_SPI_SEND(Register_Prepared);
+    while(cbData > 0)
+    {
+        TRF_SPI_RECV(*pbData);
+        pbData++;
+        cbData--;
+    }
+    TRF_CS_DISABLE();
+}
+
+void TRF7970A_SPI_Write_Packet(const uint8_t *pcbData, uint8_t cbData)
+{
+    uint8_t ui8LenLowerNibble, ui8LenHigherNibble;
+    uint16_t ui16TotalLength = cbData;
+
+    ui8LenLowerNibble = (ui16TotalLength & 0x0f) << 4;
+    ui8LenHigherNibble = (uint8_t) ((ui16TotalLength & 0x0ff0) >> 4);
+
+    TRF_CS_ENABLE();
+    TRF_SPI_SEND(TRF79X0_CONTROL_CMD | TRF79X0_RESET_FIFO_CMD);
+    TRF_SPI_SEND(TRF79X0_CONTROL_CMD | TRF79X0_TRANSMIT_CRC_CMD);
+    TRF_SPI_SEND(TRF79X0_CONTROL_REG_WRITE | TRF79X0_REG_MODE_CONTINUOUS | TRF79X0_TX_LENGTH_BYTE1_REG);
+    TRF_SPI_SEND(ui8LenHigherNibble); // in TRF79X0_TX_LENGTH_BYTE1_REG
+    TRF_SPI_SEND(ui8LenLowerNibble);  // in TRF79X0_TX_LENGTH_BYTE2_REG
+    while (cbData > 0)
+    {
+        TRF_SPI_SEND(*pcbData);       // in TRF79X0_FIFO_REG and +
+        pcbData++;
+        cbData--;
+    }
+    TRF_CS_DISABLE();
+}
+
+void TRF7970A_SPI_Ignore_Command()
+{
+    TRF7970A_SPI_DirectCommand(TRF79X0_STOP_DECODERS_CMD);
+    __delay_cycles(1);
+    TRF7970A_SPI_DirectCommand(TRF79X0_RUN_DECODERS_CMD);
+}
+
+uint8_t TRF7970A_SPI_waitIrq()
+{
+    g_irq_TRF = TRF_IRQ_READ();
+    while(!g_irq_TRF)
+    {
+        __low_power_mode_0();
+    }
+    g_irq_TRF = false;
+
+    return TRF7970A_getIrqStatus();
+}
