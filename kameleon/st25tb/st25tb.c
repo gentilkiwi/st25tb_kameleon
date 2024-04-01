@@ -5,8 +5,8 @@
 */
 #include "st25tb.h"
 
-uint8_t g_ui8FifoBuffer[0x10];
-uint8_t g_ui8cbFifoBuffer = 0;
+uint8_t g_ui8_ST25TB_Buffer[0x10];
+uint8_t g_ui8_cbST25TB_Buffer = 0;
 
 bool ST25TB_Recv(bool bIsinitiator, uint8_t irqProvided)
 {
@@ -15,10 +15,10 @@ bool ST25TB_Recv(bool bIsinitiator, uint8_t irqProvided)
     {
         if (bIsinitiator || (TRF7970A_SPI_Read_SingleRegister(TRF79X0_NFC_TARGET_PROTOCOL_REG) == TRF79X0_NFC_TARGET_PROTOCOL_14B_COMMAND))
         {
-            g_ui8cbFifoBuffer = TRF7970A_SPI_Read_SingleRegister(TRF79X0_FIFO_STATUS_REG);
-            if (g_ui8cbFifoBuffer && !(g_ui8cbFifoBuffer & TRF79X0_FIFO_OVERFLOW))
+            g_ui8_cbST25TB_Buffer = TRF7970A_SPI_Read_SingleRegister(TRF79X0_FIFO_STATUS_REG);
+            if (g_ui8_cbST25TB_Buffer && !(g_ui8_cbST25TB_Buffer & TRF79X0_FIFO_OVERFLOW))
             {
-                TRF7970A_SPI_Read_ContinuousRegister(TRF79X0_FIFO_REG, g_ui8FifoBuffer, g_ui8cbFifoBuffer);
+                TRF7970A_SPI_Read_ContinuousRegister(TRF79X0_FIFO_REG, g_ui8_ST25TB_Buffer, g_ui8_cbST25TB_Buffer);
                 status = true;
             }
         }

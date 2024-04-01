@@ -30,5 +30,5 @@ bool ST25TB_Send(const uint8_t *pcbData, const uint8_t cbData);
 #define ST25TB_CMD_SELECT               0x0e
 #define ST25TB_CMD_COMPLETION           0x0f
 
-extern uint8_t g_ui8FifoBuffer[0x10];
-extern uint8_t g_ui8cbFifoBuffer;
+extern uint8_t g_ui8_ST25TB_Buffer[0x10];
+extern uint8_t g_ui8_cbST25TB_Buffer;
