@@ -100,6 +100,53 @@ void TRF7970A_SPI_Write_Packet(const uint8_t *pcbData, uint8_t cbData)
     TRF_CS_DISABLE();
 }
 
+void TRF7970A_SPI_Write_Packet_TYPED(const uint8_t *pcbData, uint8_t cbData, const uint8_t type)
+{
+    uint8_t ui8LenLowerNibble, ui8LenHigherNibble;
+    uint16_t ui16TotalLength = cbData;
+
+    ui8LenLowerNibble = (ui16TotalLength & 0x0f) << 4;
+    ui8LenHigherNibble = (uint8_t) ((ui16TotalLength & 0x0ff0) >> 4);
+
+    TRF_CS_ENABLE();
+    TRF_SPI_SEND(MK_DC(TRF79X0_RESET_FIFO_CMD));
+    TRF_SPI_SEND(type);
+    TRF_SPI_SEND(MK_WC(TRF79X0_TX_LENGTH_BYTE1_REG));
+    TRF_SPI_SEND(ui8LenHigherNibble); // in TRF79X0_TX_LENGTH_BYTE1_REG
+    TRF_SPI_SEND(ui8LenLowerNibble);  // in TRF79X0_TX_LENGTH_BYTE2_REG
+    while (cbData > 0)
+    {
+        TRF_SPI_SEND(*pcbData);       // in TRF79X0_FIFO_REG and +
+        pcbData++;
+        cbData--;
+    }
+    TRF_CS_DISABLE();
+}
+
+
+void TRF7970A_SPI_Write_Packet_NOCRC(const uint8_t *pcbData, uint8_t cbData)
+{
+    uint8_t ui8LenLowerNibble, ui8LenHigherNibble;
+    uint16_t ui16TotalLength = cbData;
+
+    ui8LenLowerNibble = (ui16TotalLength & 0x0f) << 4;
+    ui8LenHigherNibble = (uint8_t) ((ui16TotalLength & 0x0ff0) >> 4);
+
+    TRF_CS_ENABLE();
+    TRF_SPI_SEND(MK_DC(TRF79X0_RESET_FIFO_CMD));
+    TRF_SPI_SEND(MK_DC(TRF79X0_TRANSMIT_NO_CRC_CMD));
+    TRF_SPI_SEND(MK_WC(TRF79X0_TX_LENGTH_BYTE1_REG));
+    TRF_SPI_SEND(ui8LenHigherNibble); // in TRF79X0_TX_LENGTH_BYTE1_REG
+    TRF_SPI_SEND(ui8LenLowerNibble);  // in TRF79X0_TX_LENGTH_BYTE2_REG
+    while (cbData > 0)
+    {
+        TRF_SPI_SEND(*pcbData);       // in TRF79X0_FIFO_REG and +
+        pcbData++;
+        cbData--;
+    }
+    TRF_CS_DISABLE();
+}
+
 void TRF7970A_SPI_Ignore_Command()
 {
     TRF7970A_SPI_DirectCommand(TRF79X0_STOP_DECODERS_CMD);

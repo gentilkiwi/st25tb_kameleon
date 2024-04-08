@@ -11,21 +11,29 @@
  * - unk is unk at this time.
  */
 const KAMELEON_MODE Modes[] = {
-    /*[0]*/ {MODE_emulate, Modes + 1, 1 << 0},
-    /*[1]*/ {MODE_rewrite, Modes + 2, 1 << 1},
-    /*[2]*/ {MODE_detect, Modes + 3, 1 << 2},
-    /*[3]*/ {MODE_learn, Modes + 4, 1 << 3},
-    /*[4]*/ {MODE_unk, Modes + 0, 1 << 4},
+    {MODE_emulate, 1 << 0},
+    {MODE_rewrite, 1 << 1},
+    {MODE_detect,  1 << 2},
+    {MODE_learn,   1 << 3},
+    {MODE_unk,     1 << 4},
+    {MODE_emulate_14a_st25ta512_min, 0b00011},
+    {MODE_emulate_14a_ntag210_min,   0b00110},
 };
 
 void main(void)
 {
+    uint8_t maxModes = sizeof(Modes) / sizeof(Modes[0]);
     const KAMELEON_MODE *pMode = Modes + 0;
 
     BOARD_init();
     TRF7970A_init();
     LEDS_Animation();
     SLOTS_Change(Settings.CurrentSlot);
+
+    if(P1IN & BIT4) // 14A Modes only available if pushing MODE at startup
+    {
+        maxModes -= 2;
+    }
 
     while(true)
     {
@@ -34,7 +42,11 @@ void main(void)
         LEDS_MODES_Bitmask(pMode->ledsModesBitmask);
         LEDS_STATUS_Bitmask(0);
         pMode->current();
-        pMode = pMode->next;
+        pMode++;
+        if(pMode >= (Modes + maxModes))//(sizeof(Modes) / sizeof(Modes[0]))))
+        {
+            pMode = Modes + 0;
+        }
         TIMER_delay_Milliseconds(50);
     }
 }

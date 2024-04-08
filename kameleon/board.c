@@ -206,6 +206,35 @@ uint8_t IRQ_Wait_for_SW1_or_SW2_or_TRF(uint8_t *pTRF7970A_irqStatus)
     return ret;
 }
 
+uint8_t IRQ_Wait_for_SW1_or_TRF(uint8_t *pTRF7970A_irqStatus)
+{
+    uint8_t ret = IRQ_SOURCE_NONE;
+
+    g_irq_SW1 = false;
+
+    g_irq_TRF = TRF_IRQ_READ();
+    while(!g_irq_TRF && !g_irq_SW1 && !g_irq_SW2)
+    {
+        __low_power_mode_0();
+    }
+
+    if(g_irq_TRF)
+    {
+        *pTRF7970A_irqStatus = TRF7970A_getIrqStatus();
+        g_irq_TRF = false;
+        ret |= IRQ_SOURCE_TRF7970A;
+    }
+
+    if(g_irq_SW1)
+    {
+        g_irq_SW1 = false;
+        ret |= IRQ_SOURCE_SW1;
+    }
+
+    return ret;
+}
+
+
 uint8_t IRQ_Wait_for_SW1_or_SW2_or_Timeout(uint16_t timeout_ms)
 {
     uint8_t ret = IRQ_SOURCE_NONE;

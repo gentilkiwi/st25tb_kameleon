@@ -28,6 +28,8 @@ void TRF7970A_SPI_Write_SingleRegister_internal(uint8_t Register_Prepared, const
 void TRF7970A_SPI_Read_ContinuousRegister_internal(uint8_t Register_Prepared, uint8_t *pbData, uint8_t cbData);
 
 void TRF7970A_SPI_Write_Packet(const uint8_t *pcbData, uint8_t cbData);
+void TRF7970A_SPI_Write_Packet_TYPED(const uint8_t *pcbData, uint8_t cbData, const uint8_t type);
+void TRF7970A_SPI_Write_Packet_NOCRC(const uint8_t *pcbData, uint8_t cbData);
 void TRF7970A_SPI_Ignore_Command();
 uint8_t TRF7970A_SPI_waitIrq();
 
@@ -202,6 +204,7 @@ uint8_t TRF7970A_SPI_waitIrq();
 #define TRF79X0_NFC_TARGET_PROTOCOL_RF_WAKE_UP          0x80
 #define TRF79X0_NFC_TARGET_PROTOCOL_RF_COLLISION_LEVEL  0x40
 #define TRF79X0_NFC_TARGET_PROTOCOL_FELICA              0x10
+#define TRF79X0_NFC_TARGET_PROTOCOL_PT_OR_CE            0x08 // from 6.17
 #define TRF79X0_NFC_TARGET_PROTOCOL_ISO14443A           0x00
 #define TRF79X0_NFC_TARGET_PROTOCOL_ISO14443B           0x04 // fixed from 0x40
 #define TRF79X0_NFC_TARGET_PROTOCOL_KBPS_MASK           0x03
@@ -211,7 +214,7 @@ uint8_t TRF7970A_SPI_waitIrq();
 
 // 6.15.3.3.10
 #define TRF79X0_NFC_TARGET_PROTOCOL_14B_COMMAND         (TRF79X0_NFC_TARGET_PROTOCOL_RF_WAKE_UP | TRF79X0_NFC_TARGET_PROTOCOL_RF_COLLISION_LEVEL | TRF79X0_NFC_TARGET_PROTOCOL_ISO14443B | TRF79X0_NFC_TARGET_PROTOCOL_106KBPS)
-
+#define TRF79X0_NFC_TARGET_PROTOCOL_14A_COMMAND         (TRF79X0_NFC_TARGET_PROTOCOL_RF_WAKE_UP | TRF79X0_NFC_TARGET_PROTOCOL_RF_COLLISION_LEVEL | TRF79X0_NFC_TARGET_PROTOCOL_ISO14443A)
 
 #define TRF79X0_IRQ_STATUS_COL_ERR                      0x01 // The external RF field was present so the collision avoidance could not be carried out.
 #define TRF79X0_IRQ_STATUS_COL                          0x02 // The system has finished collision avoidance and the minimum wait time is elapsed.

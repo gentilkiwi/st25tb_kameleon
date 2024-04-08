@@ -7,6 +7,7 @@
 #include <msp430fr2673.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "slots.h"
 #include "leds.h"
@@ -42,6 +43,7 @@ void TIMER_delay_Microseconds_internal(uint16_t n_unit_us); // max is UINT16_MAX
 uint8_t IRQ_Wait_for_SW1();
 uint8_t IRQ_Wait_for_SW1_or_SW2();
 uint8_t IRQ_Wait_for_SW1_or_SW2_or_TRF(uint8_t *pTRF7970A_irqStatus);
+uint8_t IRQ_Wait_for_SW1_or_TRF(uint8_t *pTRF7970A_irqStatus);
 uint8_t IRQ_Wait_for_SW1_or_SW2_or_Timeout(uint16_t timeout_ms);
 uint8_t IRQ_Wait_for_SW1_or_SW2_or_TRF_or_Timeout(uint8_t *pTRF7970A_irqStatus, uint16_t timeout_ms);
 
