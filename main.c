@@ -5,48 +5,53 @@
 */
 #include "kameleon/board.h"
 
-/*
- * - Can be simplified with an index if 'only' 5 modes
- *   ... but just in case we want to add more, with LEDS mix
- * - unk is unk at this time.
- */
 const KAMELEON_MODE Modes[] = {
     {MODE_emulate, 1 << 0},
     {MODE_rewrite, 1 << 1},
     {MODE_detect,  1 << 2},
-    {MODE_learn,   1 << 3},
+    {MODE_select,  1 << 3},
     {MODE_unk,     1 << 4},
-    {MODE_emulate_14a_st25ta512_min, 0b00011},
-    {MODE_emulate_14a_ntag210_min,   0b00110},
+};
+
+const KAMELEON_MODE Modes_2[] = {
+    {MODE_emulate_14a_st25ta512_min, 0b11 << 0},
+    {MODE_emulate_14a_ntag210_min,   0b11 << 1},
+    {MODE_learn,   1 << 3},
 };
 
 void main(void)
 {
-    uint8_t maxModes = sizeof(Modes) / sizeof(Modes[0]);
-    const KAMELEON_MODE *pMode = Modes + 0;
+    uint8_t maxModes;
+    const KAMELEON_MODE *pMode, *cMode;
 
     BOARD_init();
     TRF7970A_init();
     LEDS_Animation();
     SLOTS_Change(Settings.CurrentSlot);
 
-    if(P1IN & BIT4) // 14A Modes only available if pushing MODE at startup
+    if(P1IN & BIT4) // 14A Modes and LEARN only available if pushing MODE at startup
     {
-        maxModes -= 2;
+        pMode = cMode = Modes;
+        maxModes = sizeof(Modes) / sizeof(Modes[0]);
+    }
+    else
+    {
+        pMode = cMode = Modes_2;
+        maxModes = sizeof(Modes_2) / sizeof(Modes_2[0]);;
     }
 
     while(true)
     {
         g_irq_SW1 = false;
         g_irq_SW2 = false;
-        LEDS_MODES_Bitmask(pMode->ledsModesBitmask);
+        LEDS_MODES_Bitmask(cMode->ledsModesBitmask);
         LEDS_STATUS_Bitmask(0);
-        pMode->current();
-        pMode++;
-        if(pMode >= (Modes + maxModes))//(sizeof(Modes) / sizeof(Modes[0]))))
+        cMode->current();
+        cMode++;
+        if(cMode >= (pMode + maxModes))
         {
-            pMode = Modes + 0;
+            cMode = pMode + 0;
         }
-        TIMER_delay_Milliseconds(50);
+        TIMER_delay_Milliseconds(150);
     }
 }

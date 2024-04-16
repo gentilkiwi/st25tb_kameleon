@@ -11,6 +11,7 @@
 #include "modes/emulate.h"
 #include "modes/rewrite.h"
 #include "modes/detect.h"
+#include "modes/select.h"
 #include "modes/learn.h"
 #include "modes/unk.h"
 #include "modes/emulate_14a.h"

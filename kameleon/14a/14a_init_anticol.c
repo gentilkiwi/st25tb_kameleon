@@ -15,6 +15,7 @@ uint8_t k14a_anticol_opitimized_recv()
     {
         level = TRF7970A_SPI_Read_SingleRegister(TRF79X0_FIFO_REG);
     }
+
     return level;
 }
 
@@ -28,7 +29,7 @@ bool k14a_anticol_loop() // we try to know by IRQ Status and fifo size before to
     /*
      * Send ATQA
      */
-    __delay_cycles(K14A_ANTICOL_GENERIC_DELAY_CYCLES + 15);
+    __delay_cycles(K14A_ANTICOL_GENERIC_DELAY_CYCLES + 120);
     k14a_Send(k14a_init_anticol_optimized_buffer + 0, 2, false);
     do
     {
@@ -102,6 +103,10 @@ bool k14a_anticol_loop() // we try to know by IRQ Status and fifo size before to
                         pcbData = 0;
                     }
                 }
+            }
+            else
+            {
+                TRF7970A_SPI_DirectCommand(TRF79X0_RESET_FIFO_CMD);
             }
         }
 
