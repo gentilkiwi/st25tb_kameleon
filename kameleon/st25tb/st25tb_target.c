@@ -50,6 +50,7 @@ tSt25TbState ST25TB_Target_StateMachine()
         break;
 
     case Inventory:
+    case Deselected:
 
         if ((g_ui8_cbST25TB_Buffer == 2) && (g_ui8_ST25TB_Buffer[0] == ST25TB_CMD_SELECT))
         {
@@ -120,25 +121,6 @@ tSt25TbState ST25TB_Target_StateMachine()
                 cbData = sizeof(ST25TB_TARGET_KIWI_SPECIAL_RETCODE_OK);
                 delay = ST25TB_TARGET_DELAY_US_GLOBAL;
             }
-        }
-
-        break;
-
-    case Deselected:
-
-        if ((g_ui8_cbST25TB_Buffer == 2) && (g_ui8_ST25TB_Buffer[0] == ST25TB_CMD_SELECT))
-        {
-            if (g_ui8_ST25TB_Buffer[1] == st25tb_ui8ChipId)
-            {
-                g_eCurrentTargetState = Selected;
-            }
-            pcbData = &st25tb_ui8ChipId;
-            cbData = sizeof(st25tb_ui8ChipId);
-            delay = ST25TB_TARGET_DELAY_US_GLOBAL + ST25TB_TARGET_DELAY_US_MEDIUM;
-        }
-        else
-        {
-            g_eCurrentTargetState = PowerOff;
         }
 
         break;

@@ -98,6 +98,7 @@ bool k14a_Dispatch_14a(const T3A_INFOS *pt3a_infos, PDISPATCH_14A_ROUTINE pDispa
     {
         pcbData = pt3a_infos->ATS;
         cbData = pt3a_infos->cbATS;
+        __delay_cycles(200);
     }
     else if((g_ui8_cb14a_Buffer == 2) &&  (g_ui8_14a_Buffer[0] == HLTA) && (g_ui8_14a_Buffer[1] == 0x00))
     {

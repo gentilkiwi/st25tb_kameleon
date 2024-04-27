@@ -16,11 +16,11 @@
  *  t1 Synchronization delay          151 탎
  *  t2 Answer to new request delay >= 132 탎
  *
- *  -> focus on t0 < 159 탎 ?
+ *  -> focus on t0 <= 160 탎 ?
  */
-#define ST25TB_TARGET_DELAY_US_GLOBAL  81
-#define ST25TB_TARGET_DELAY_US_MEDIUM  17
-#define ST25TB_TARGET_DELAY_US_SMALL   8
+#define ST25TB_TARGET_DELAY_US_GLOBAL  96
+#define ST25TB_TARGET_DELAY_US_MEDIUM  11
+#define ST25TB_TARGET_DELAY_US_SMALL   3
 
 typedef enum __attribute__((__packed__)) _tSt25TbState {
     Invalid,

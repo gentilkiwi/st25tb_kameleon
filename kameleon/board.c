@@ -213,7 +213,7 @@ uint8_t IRQ_Wait_for_SW1_or_TRF(uint8_t *pTRF7970A_irqStatus)
     g_irq_SW1 = false;
 
     g_irq_TRF = TRF_IRQ_READ();
-    while(!g_irq_TRF && !g_irq_SW1 && !g_irq_SW2)
+    while(!g_irq_TRF && !g_irq_SW1)
     {
         __low_power_mode_0();
     }

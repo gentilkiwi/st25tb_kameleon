@@ -10,15 +10,19 @@
 #define TRF_DISABLE()       TRF_EN_PORT &= ~TRF_EN_BIT
 
 #define TRF_CS_ENABLE()     TRF_CS_PORT &= ~TRF_CS_BIT
-#define TRF_CS_DISABLE()    TRF_CS_PORT |= TRF_CS_BIT
+#define TRF_CS_DISABLE()    do{TRF_SPI_WAIT_BUSY(); TRF_CS_PORT |= TRF_CS_BIT;} while(0)
 
 #define TRF_IRQ_READ()      (TRF_IRQ_PORT & TRF_IRQ_BIT)
 #define TRF_IRQ_ENABLE()    do{TRF_IRQ_IFG &= ~TRF_IRQ_BIT; g_irq_TRF = TRF_IRQ_READ(); TRF_IRQ_IE |= TRF_IRQ_BIT;} while(0)
 #define TRF_IRQ_DISABLE()   TRF_IRQ_IE &= ~TRF_IRQ_BIT
 #define TRF_IRQ_CLEAR()     TRF_IRQ_IFG &= ~TRF_IRQ_BIT
 
-#define TRF_SPI_SEND(s)     do{UCB1TXBUF = s; while(UCB1STATW & UCBUSY__BUSY);} while(0)
-#define TRF_SPI_RECV(r)     do{UCB1TXBUF = 0x00; while(UCB1STATW & UCBUSY__BUSY); r = UCB1RXBUF;} while(0)
+#define TRF_SPI_WAIT_BUSY() while(UCB1STATW & UCBUSY__BUSY);
+#define TRF_SPI_WAIT_TX()   while(!(UCB1IFG & UCTXIFG))
+#define TRF_SPI_WAIT_RX()   while(!(UCB1IFG & UCRXIFG))
+
+#define TRF_SPI_SEND(s)     do{UCB1TXBUF = s; TRF_SPI_WAIT_TX(); } while(0) // Usually, WAIT_TX before sending, but 1/ we're sure 1st one will be ok, 2/ more efficient for direct reading after
+#define TRF_SPI_RECV(r)     do{UCB1TXBUF = 0x00; TRF_SPI_WAIT_BUSY(); r = UCB1RXBUF;} while(0)   // More efficient than playing with RX/TX or IRQ...
 
 void TRF7970A_init();
 void TRF7970A_SPI_Send_raw(const uint8_t *pcbData, uint8_t cbData);
@@ -27,9 +31,10 @@ uint8_t TRF7970A_SPI_Read_SingleRegister_internal(uint8_t Register_Prepared);
 void TRF7970A_SPI_Write_SingleRegister_internal(uint8_t Register_Prepared, const uint8_t Value);
 void TRF7970A_SPI_Read_ContinuousRegister_internal(uint8_t Register_Prepared, uint8_t *pbData, uint8_t cbData);
 
-void TRF7970A_SPI_Write_Packet(const uint8_t *pcbData, uint8_t cbData);
+#define TRF7970A_SPI_Write_Packet(pcbData, cbData)  TRF7970A_SPI_Write_Packet_TYPED(pcbData, cbData, MK_DC(TRF79X0_TRANSMIT_CRC_CMD))
+#define TRF7970A_SPI_Write_Packet_NOCRC(pcbData, cbData)  TRF7970A_SPI_Write_Packet_TYPED(pcbData, cbData, MK_DC(TRF79X0_TRANSMIT_NO_CRC_CMD))
 void TRF7970A_SPI_Write_Packet_TYPED(const uint8_t *pcbData, uint8_t cbData, const uint8_t type);
-void TRF7970A_SPI_Write_Packet_NOCRC(const uint8_t *pcbData, uint8_t cbData);
+
 void TRF7970A_SPI_Ignore_Command();
 uint8_t TRF7970A_SPI_waitIrq();
 
