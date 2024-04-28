@@ -17,7 +17,7 @@
 #define TRF_IRQ_DISABLE()   TRF_IRQ_IE &= ~TRF_IRQ_BIT
 #define TRF_IRQ_CLEAR()     TRF_IRQ_IFG &= ~TRF_IRQ_BIT
 
-#define TRF_SPI_WAIT_BUSY() while(UCB1STATW & UCBUSY__BUSY);
+#define TRF_SPI_WAIT_BUSY() while(UCB1STATW & UCBUSY__BUSY)
 #define TRF_SPI_WAIT_TX()   while(!(UCB1IFG & UCTXIFG))
 #define TRF_SPI_WAIT_RX()   while(!(UCB1IFG & UCRXIFG))
 
