@@ -90,9 +90,14 @@ At startup/reset, the content of the last used slot is loaded from the flash mem
 |🔵|⚫|⚫|⚫|⚫|⚫|⚫|⚫|
 
 To avoid misusage, at this time, only the `LEARN` mode (with `SLOT/ACT` button) or the `DETECT` mode (by detecting an existing stored card) is able to change the selected slot.  
+**NEW!** to avoid mishandling, the real `LEARN` mode is only available in a special startup mode: by holding `MODE` then `RESET` (or power on) - see [special-startup](#special-startup), [learn-mode part](#learn-mode---dangerous)
 
 
-### Emulator mode - _(default)_
+### Normal startup
+
+________________
+
+#### Emulator mode - _(default)_
 ⚪ EMUL - ⚫ WRITE - ⚫ DETECT - ⚫ LEARN - ⚫ (⊙_⊙)?
 
 In this mode, it reacts like a normal SRI/SRT/ST25TB card, with few differences:
@@ -109,8 +114,9 @@ Buttons:
 - 🔳 MODE: will go to the next configured mode (`WRITE`)
 - 🔳 SLOT/ACT: _not used_
 
+________________
 
-### Writer mode
+#### Writer mode
 ⚫ EMUL - ⚪ WRITE - ⚫ DETECT - ⚫ LEARN - ⚫ (⊙_⊙)?
 
 In this mode, it will try to write the emulator content back to the original card.  
@@ -125,8 +131,9 @@ Buttons:
 - 🔳 MODE: will go to the next configured mode (`DETECT`)
 - 🔳 SLOT/ACT: will restart the write loop
 
+________________
 
-### Detect mode
+#### Detect mode
 ⚫ EMUL - ⚫ WRITE - ⚪ DETECT - ⚫ LEARN - ⚫ (⊙_⊙)?
 
 In this mode, it will try to detect any SRI/SRT/ST25TB card, and search in slots memory any cards with the same UID.  
@@ -149,26 +156,22 @@ Buttons:
 - 🔳 MODE: will go to the next configured mode (`LEARN`)
 - 🔳 SLOT/ACT: will restart the detect loop
 
+________________
 
-### Learn mode - _dangerous!_
+#### ~~Learn mode - _dangerous!_~~ Select mode
 ⚫ EMUL - ⚫ WRITE - ⚫ DETECT - ⚪ LEARN - ⚫ (⊙_⊙)?
 
-In this mode, it will read an original card and store it into the current slot's persistent memory.  
-This mode is also here to change the current slot to another one - to emulate in `EMUL` mode, or to store card into.  
-It starts by searching to detect a card with status led `●` blinking (🔵/⚫).
+This mode is  here to change the current slot to another one - to emulate in `EMUL` mode, or to store card into.  
 
-Status LEDs:
-- ❌: 🔴 - indicates that an error occured (no confirmed read by example)
-  - **does not stop the routine** and will retry until success (or button)
-- ✅: 🟢 - indicates that card successfully readed **and saved to the current slot**
+Status LEDs: ❌, ✅ & ● : ⚫ - _not used_
 
 Buttons:
 - 🔳 MODE: will go to the next configured mode (`(⊙_⊙)?`)
 - 🔳 SLOT/ACT: will select and load the next slot
-  - no need to read a card if only changing slot is needed
 
+________________
 
-### (⊙_⊙)? mode
+#### (⊙_⊙)? mode
 ⚫ EMUL - ⚫ WRITE - ⚫ DETECT - ⚫ LEARN - ⚪ (⊙_⊙)?
 
 _This mode is not really needed..._ at this time it only displays the first byte in `Counter1` sector.  
@@ -200,6 +203,183 @@ Status LEDs:
 |-|-|-|-|-|-|-|-|
 |⚫|🔵|🔵|⚫|⚫|⚫|🔵|⚫|
 
+________________
+
+### Special Startup
+
+This special startup mode is accessible by holding `MODE` then `RESET` (or power on). This is now the way to access the real `LEARN` mode to be able to load an original card into a slot.
+
+________________
+
+#### 14A - T4 NDEF
+⚪ EMUL - ⚪ WRITE - ⚫ DETECT - ⚫ LEARN - ⚫ (⊙_⊙)?
+
+This mode is emulating a 14A tag with a Type 4 NDEF message (URL to GitHub project) - a not real `ST25TA512` with UID: `02E50011223344`, and minimalist NDEF support.
+
+```
+[usb] pm3 --> hf 14a info
+
+[+]  UID: 02 E5 00 11 22 33 44
+[+] ATQA: 00 42
+[+]  SAK: 20 [1]
+[+] MANUFACTURER: ST Microelectronics SA France
+[=] -------------------------- ATS --------------------------
+[+] ATS: 02 05 [ 7A 44 ]
+[=]      02...............  TL    length is 2 bytes
+[=]         05............  T0    TA1 is NOT present, TB1 is NOT present, TC1 is NOT present, FSCI is 5 (FSC = 64)
+
+...
+
+[usb] pm3 --> hf 14a ndefread -vv
+
+[+] ------------ Capability Container file ------------
+[+]  Version... v2.0 ( 0x20 )
+[+]  Len....... 15 bytes ( 0x0F )
+[+]  Max bytes read  255 bytes ( 0x00FF )
+[+]  Max bytes write 54 bytes ( 0x0036 )
+
+[+]  NDEF file control TLV
+[+]     (t) type of file.... 04
+[+]     (v) ................ 06
+[+]     file id............. 0001
+[+]     Max NDEF filesize... 44 bytes ( 0x002C )
+[+]     Access rights
+[+]     read   ( 00 ) protection: disabled
+[+]     write  ( FF ) protection: enabled
+[+]
+[+] ----------------- raw -----------------
+[+] 000F2000FF003604060001002C00FF
+
+
+[=] --- NDEF raw ----------------
+[=]     00: D1 01 26 55 04 67 69 74 68 75 62 2E 63 6F 6D 2F | ..&U.github.com/
+[=]     10: 67 65 6E 74 69 6C 6B 69 77 69 2F 73 74 32 35 74 | gentilkiwi/st25t
+[=]     20: 62 5F 6B 61 6D 65 6C 65 6F 6E                   | b_kameleon
+
+[+] Record 1
+[=] -----------------------------------------------------
+[=] Header info
+[+]   1 ....... Message begin
+[+]    1 ...... Message end
+[+]     0 ..... Chunk flag
+[+]      1 .... Short record bit
+[+]       0 ... ID Len present
+[+]
+[+]  Header length...... 3
+[+]  Type length........ 1
+[+]  Payload length..... 38
+[+]  ID length.......... 0
+[+]  Type name format... [ 0x01 ] Well Known Record
+[+]  Record length...... 42
+[=]
+[=] Payload info
+[=] Type data
+[=]     00: 55                                              | U
+[=] Payload data
+[=]     00: 04 67 69 74 68 75 62 2E 63 6F 6D 2F 67 65 6E 74 | .github.com/gent
+[=]     10: 69 6C 6B 69 77 69 2F 73 74 32 35 74 62 5F 6B 61 | ilkiwi/st25tb_ka
+[=]     20: 6D 65 6C 65 6F 6E                               | meleon
+[=]
+[=] URL
+[=]     uri... https://github.com/gentilkiwi/st25tb_kameleon
+[=]
+```
+
+It can be read with modern iPhone & Android, but not Pixel 7 (/Pro). May be a bug in the TRF chipset: https://e2e.ti.com/support/wireless-connectivity/other-wireless-group/other-wireless/f/other-wireless-technologies-forum/1349254/trf7970a-nfc-a-emulation-problem-when-nfc-f-felica-discovery-from-android
+
+________________
+
+#### 14A - T2 NDEF
+⚫ EMUL - ⚪ WRITE - ⚪ DETECT - ⚫ LEARN - ⚫ (⊙_⊙)?
+
+This mode is emulating a 14A tag with a Type 2 NDEF message (little text) - a not real `NTAG 210` with UID: `04A8C4AA286380`, and minimalist NDEF support.
+
+```
+[usb] pm3 --> hf mfu info
+
+[=] --- Tag Information --------------------------
+[+]       TYPE: NTAG 210 48bytes (NT2L1011G0DU)
+[+]        UID: 04 A8 C4 AA 28 63 80
+[+]     UID[0]: 04, NXP Semiconductors Germany
+[+]       BCC0: E0 ( ok )
+[+]       BCC1: 61 ( ok )
+[+]   Internal: 48 ( default )
+[+]       Lock: FF FF  - 1111111111111111
+[+]        OTP: E1 10 06 00  - 11100001000100000000011000000000
+
+[=] --- NDEF Message
+[+] Capability Container: E1 10 06 00
+[+]   E1: NDEF Magic Number
+[+]   10: version 0.1 supported by tag
+[+]        : Read access granted without any security / Write access granted without any security
+[+]   06: Physical Memory Size: 48 bytes
+[+]   06: NDEF Memory Size: 48 bytes
+[+]   00: Additional feature information
+[+]   00000000
+[+]   000 .... - RFU
+[+]   ...0 ... - Don't support special frame
+[+]   ....0 .. - Don't support lock block
+[+]   .....00  - RFU
+[+]   .......0 - IC don't support multiple block reads
+[=]
+[=] --- Fingerprint
+[=] n/a
+
+...
+
+[usb] pm3 --> hf mfu ndefread
+
+[=] --- NDEF Message
+[+] Capability Container: E1 10 06 00
+[+]   E1: NDEF Magic Number
+[+]   10: version 0.1 supported by tag
+[+]        : Read access granted without any security / Write access granted without any security
+[+]   06: Physical Memory Size: 48 bytes
+[+]   06: NDEF Memory Size: 48 bytes
+[+]   00: Additional feature information
+[+]   00000000
+[+]   000 .... - RFU
+[+]   ...0 ... - Don't support special frame
+[+]   ....0 .. - Don't support lock block
+[+]   .....00  - RFU
+[+]   .......0 - IC don't support multiple block reads
+[=] Tag reported size vs NDEF reported size mismatch. Using smallest value
+
+[=] --- NDEF parsing ----------------
+
+[+] --- NDEF Message ---
+[+] Found NDEF message ( 21 bytes )
+
+[+] Record 1
+[=] -----------------------------------------------------
+[=]
+[=] Text
+[=]     UTF 8... fr, 🥝❤️🦆
+[=]
+```
+
+It can be read with iPhone (specific application) & Android, but not Pixel 7 (/Pro). May be a bug in the TRF chipset: https://e2e.ti.com/support/wireless-connectivity/other-wireless-group/other-wireless/f/other-wireless-technologies-forum/1349254/trf7970a-nfc-a-emulation-problem-when-nfc-f-felica-discovery-from-android
+
+________________
+
+#### Learn mode - _dangerous!_
+⚫ EMUL - ⚫ WRITE - ⚫ DETECT - ⚪ LEARN - ⚫ (⊙_⊙)?
+
+In this mode, it will read an original card and store it into the current slot's persistent memory.  
+This mode is also here to change the current slot to another one - to emulate in `EMUL` mode, or to store card into.  
+It starts by searching to detect a card with status led `●` blinking (🔵/⚫).
+
+Status LEDs:
+- ❌: 🔴 - indicates that an error occured (no confirmed read by example)
+  - **does not stop the routine** and will retry until success (or button)
+- ✅: 🟢 - indicates that card successfully readed **and saved to the current slot**
+
+Buttons:
+- 🔳 MODE: will go to the next configured mode (`(⊙_⊙)?`)
+- 🔳 SLOT/ACT: will select and load the next slot
+  - no need to read a card if only changing slot is needed
+
+________________
 
 ## Remarks
 
