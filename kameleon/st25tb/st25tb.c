@@ -74,7 +74,7 @@ void ST25TB_TRF7970A_Mode(bool bIsInitiator)
     TRF_IRQ_DISABLE();
 
     TRF7970A_SPI_DirectCommand(TRF79X0_SOFT_INIT_CMD);
-    __delay_cycles(1);
+    __no_operation();
     TRF7970A_SPI_DirectCommand(TRF79X0_IDLE_CMD);
     TIMER_delay_Milliseconds(2);
 
