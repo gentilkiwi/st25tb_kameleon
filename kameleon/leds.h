@@ -16,7 +16,7 @@ extern const LED LEDS[];
 #define LEDS_MODES      LEDS
 #define NB_LEDS_MODES   5
 #define LEDS_SLOTS      LEDS_MODES + NB_LEDS_MODES
-#define NB_LEDS_SLOTS   SLOTS_COUNT // 8
+#define NB_LEDS_SLOTS   8
 #define LEDS_STATUS     LEDS_SLOTS + NB_LEDS_SLOTS
 #define NB_LEDS_STATUS  3
 

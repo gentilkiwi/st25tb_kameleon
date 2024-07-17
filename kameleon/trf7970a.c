@@ -97,13 +97,6 @@ void TRF7970A_SPI_Write_Packet_TYPED(const uint8_t *pcbData, uint8_t cbData, con
     TRF_CS_DISABLE();
 }
 
-void TRF7970A_SPI_Ignore_Command()
-{
-    TRF7970A_SPI_DirectCommand(TRF79X0_STOP_DECODERS_CMD);
-    __no_operation();
-    TRF7970A_SPI_DirectCommand(TRF79X0_RUN_DECODERS_CMD);
-}
-
 uint8_t TRF7970A_SPI_waitIrq()
 {
     g_irq_TRF = TRF_IRQ_READ();

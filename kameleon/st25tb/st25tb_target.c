@@ -99,7 +99,7 @@ tSt25TbState ST25TB_Target_StateMachine()
             if (g_ui8_ST25TB_Buffer[0] == ST25TB_CMD_READ_BLOCK)
             {
                 idx = ST25TB_Target_AdjustIdxForSpecialAddr(g_ui8_ST25TB_Buffer[1]);
-                if(idx < 0x83)
+                if(idx < SLOTS_ST25TB_SECTORS_INTERNAL)
                 {
                     pcbData = SLOTS_ST25TB_Current[idx];
                     cbData = sizeof(SLOTS_ST25TB_Current[0]);
@@ -110,7 +110,7 @@ tSt25TbState ST25TB_Target_StateMachine()
         else if ((g_ui8_cbST25TB_Buffer == 6) && (g_ui8_ST25TB_Buffer[0] == ST25TB_CMD_WRITE_BLOCK))
         {
             idx = ST25TB_Target_AdjustIdxForSpecialAddr(g_ui8_ST25TB_Buffer[1]);
-            if(idx < 0x83)
+            if(idx < SLOTS_ST25TB_SECTORS_INTERNAL)
             {
                 *(uint32_t *) SLOTS_ST25TB_Current[idx] = *(uint32_t *) (g_ui8_ST25TB_Buffer + 2);
             }
@@ -143,7 +143,10 @@ tSt25TbState ST25TB_Target_StateMachine()
     }
     else if(g_eCurrentTargetState != Invalid)
     {
-        TRF7970A_SPI_Ignore_Command();
+        TRF7970A_SPI_DirectCommand(TRF79X0_STOP_DECODERS_CMD);
+        __no_operation();
+        __no_operation();
+        TRF7970A_SPI_DirectCommand(TRF79X0_RUN_DECODERS_CMD);
     }
 
     return g_eCurrentTargetState;

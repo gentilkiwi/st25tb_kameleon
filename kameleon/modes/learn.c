@@ -40,7 +40,7 @@ void MODE_learn()
         {
             LEDS_STATUS_Bitmask(0b000);
             index++;
-            if(index >= SLOTS_COUNT)
+            if(index >= SLOTS_ST25TB_COUNT)
             {
                 index = 0;
             }

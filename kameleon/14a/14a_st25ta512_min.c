@@ -4,7 +4,7 @@
     Licence : https://creativecommons.org/licenses/by/4.0/
 */
 #include "14a_st25ta512_min.h"
-
+#if defined(ST25TB_SUPPORT_A_ST25TA512)
 const T3A_INFOS t3a_infos_st25ta512 = {
     .UID = {0x02, 0xe5, 0x00, 0x11, 0x22, 0x33, 0x44}, .tUID = T3A_UID_7BYTES,
     .ATQA = {0x42, 0x00}, .SAK = 0x20,
@@ -207,4 +207,4 @@ void Dispatch_14a_ST25TA512(const uint8_t **ppcbData, uint8_t *pcbData)
         *pcbData = ui8_cb14ASendBuffer;
     }
 }
-
+#endif

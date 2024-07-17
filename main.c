@@ -6,17 +6,21 @@
 #include "kameleon/board.h"
 
 const KAMELEON_MODE Modes[] = {
-    {MODE_emulate, 1 << 0},
-    {MODE_rewrite, 1 << 1},
-    {MODE_detect,  1 << 2},
-    {MODE_select,  1 << 3},
-    {MODE_unk,     1 << 4},
+    {.function = MODE_emulate, .ledsModesBitmask = 1 << 0},
+    {.function = MODE_rewrite, .ledsModesBitmask = 1 << 1},
+    {.function = MODE_detect,  .ledsModesBitmask = 1 << 2},
+    {.function = MODE_select,  .ledsModesBitmask = 1 << 3},
+    {.function = MODE_unk,     .ledsModesBitmask = 1 << 4},
 };
 
 const KAMELEON_MODE Modes_2[] = {
-    {MODE_emulate_14a_st25ta512_min, 0b11 << 0},
-    {MODE_emulate_14a_ntag210_min,   0b11 << 1},
-    {MODE_learn,   1 << 3},
+#if defined(ST25TB_SUPPORT_A_ST25TA512)
+    {.function = MODE_emulate_14a_st25ta512_min, .ledsModesBitmask = 0b11 << 0},
+#endif
+#if defined(ST25TB_SUPPORT_A_NTAG210)
+    {.function = MODE_emulate_14a_ntag210_min,   .ledsModesBitmask = 0b11 << 1},
+#endif
+    {.function = MODE_learn,   .ledsModesBitmask = 1 << 3},
 };
 
 void main(void)
@@ -32,12 +36,12 @@ void main(void)
     if(P1IN & BIT4) // 14A Modes and LEARN only available if pushing MODE at startup
     {
         pMode = cMode = Modes;
-        maxModes = sizeof(Modes) / sizeof(Modes[0]);
+        maxModes = count_of(Modes);
     }
     else
     {
         pMode = cMode = Modes_2;
-        maxModes = sizeof(Modes_2) / sizeof(Modes_2[0]);;
+        maxModes = count_of(Modes_2);
     }
 
     while(true)
@@ -46,7 +50,14 @@ void main(void)
         g_irq_SW2 = false;
         LEDS_MODES_Bitmask(cMode->ledsModesBitmask);
         LEDS_STATUS_Bitmask(0);
-        cMode->current();
+
+        cMode->function();
+
+        __no_operation();
+        TRF7970A_SPI_DirectCommand(TRF79X0_STOP_DECODERS_CMD);
+        __no_operation();
+        __no_operation();
+        TRF7970A_SPI_Write_SingleRegister(TRF79X0_CHIP_STATUS_CTRL_REG, 0x00);
         cMode++;
         if(cMode >= (pMode + maxModes))
         {

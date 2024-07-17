@@ -4,7 +4,7 @@
     Licence : https://creativecommons.org/licenses/by/4.0/
 */
 #include "14a_ntag210_min.h"
-
+#if defined(ST25TB_SUPPORT_A_NTAG210)
 const T3A_INFOS t3a_infos_ntag210 = {
     .UID = {0x04, 0xa8, 0xc4, 0xaa, 0x28, 0x63, 0x80}, .tUID = T3A_UID_7BYTES,
     .ATQA = {0x44, 0x00}, .SAK = 0x00,
@@ -92,3 +92,4 @@ void Dispatch_14a_NTAG210(const uint8_t **ppcbData, uint8_t *pcbData)
         ;
     }
 }
+#endif

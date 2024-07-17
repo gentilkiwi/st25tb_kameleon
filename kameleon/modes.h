@@ -18,6 +18,6 @@
 
 typedef void (* PMODE_FUNCTION) ();
 typedef struct _KAMELEON_MODE {
-    const PMODE_FUNCTION current;
+    const PMODE_FUNCTION function;
     const uint8_t ledsModesBitmask;
 } KAMELEON_MODE, *PKAMELEON_MODE;

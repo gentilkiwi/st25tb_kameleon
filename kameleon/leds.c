@@ -31,7 +31,7 @@ void LEDS_Bitmask(const LED *LEDS_ARRAY, const uint8_t nbLeds, uint8_t bitmask)
 {
     uint8_t i;
 
-    for(i = 0; i < nbLeds; i++)
+    for(i = 0; i < nbLeds; i++, bitmask >>= 1)
     {
         if(bitmask & 0b00000001)
         {
@@ -41,7 +41,6 @@ void LEDS_Bitmask(const LED *LEDS_ARRAY, const uint8_t nbLeds, uint8_t bitmask)
         {
             *LEDS_ARRAY[i].portOutput &= ~LEDS_ARRAY[i].bit;
         }
-        bitmask >>= 1;
     }
 }
 

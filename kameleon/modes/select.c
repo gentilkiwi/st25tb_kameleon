@@ -15,11 +15,13 @@ void MODE_select()
         if(BP_IrqSource & IRQ_SOURCE_SW2)
         {
             index++;
-            if(index >= SLOTS_COUNT)
+            if(index >= SLOTS_ST25TB_COUNT)
             {
                 index = 0;
             }
             SLOTS_Change(index);
+
+            TIMER_delay_Milliseconds(150);
         }
     }
     while (!(BP_IrqSource & IRQ_SOURCE_SW1));

@@ -234,7 +234,6 @@ uint8_t IRQ_Wait_for_SW1_or_TRF(uint8_t *pTRF7970A_irqStatus)
     return ret;
 }
 
-
 uint8_t IRQ_Wait_for_SW1_or_SW2_or_Timeout(uint16_t timeout_ms)
 {
     uint8_t ret = IRQ_SOURCE_NONE;
@@ -272,6 +271,9 @@ uint8_t IRQ_Wait_for_SW1_or_SW2_or_Timeout(uint16_t timeout_ms)
 uint8_t IRQ_Wait_for_SW1_or_SW2_or_TRF_or_Timeout(uint8_t *pTRF7970A_irqStatus, uint16_t timeout_ms)
 {
     uint8_t ret = IRQ_SOURCE_NONE;
+
+    g_irq_SW1 = false;
+    g_irq_SW2 = false;
 
     TIMER_start_Milliseconds(timeout_ms);
     g_irq_TRF = TRF_IRQ_READ();
