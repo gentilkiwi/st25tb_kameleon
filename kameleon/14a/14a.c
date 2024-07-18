@@ -77,6 +77,7 @@ void k14a_TRF7970A_Mode()
 
     TRF7970A_SPI_DirectCommand(TRF79X0_SOFT_INIT_CMD);
     __no_operation();
+    __no_operation();
     TRF7970A_SPI_DirectCommand(TRF79X0_IDLE_CMD);
     TIMER_delay_Milliseconds(2);
 

@@ -15,6 +15,8 @@ void TRF7970A_init()
     TIMER_delay_Milliseconds(10);
     // 6.11 TRF7970A Initialization
     TRF7970A_SPI_DirectCommand(TRF79X0_SOFT_INIT_CMD);
+    __no_operation();
+    __no_operation();
     TRF7970A_SPI_DirectCommand(TRF79X0_IDLE_CMD);
     TIMER_delay_Milliseconds(1);
     TRF7970A_SPI_DirectCommand(TRF79X0_RESET_FIFO_CMD);
