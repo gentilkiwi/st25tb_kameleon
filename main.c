@@ -4,6 +4,7 @@
     Licence : https://creativecommons.org/licenses/by/4.0/
 */
 #include "kameleon/board.h"
+#include "kameleon/modes.h"
 
 const KAMELEON_MODE Modes[] = {
     {.function = MODE_emulate, .ledsModesBitmask = 1 << 0},

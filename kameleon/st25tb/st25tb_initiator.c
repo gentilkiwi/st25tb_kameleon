@@ -17,17 +17,28 @@ uint8_t ST25TB_Initiator_CMD_CONFIRMED_Read_Block(const uint8_t ui8BlockIdx, uin
 uint8_t ST25TB_Initiator_CMD_Write_Block(const uint8_t ui8BlockIdx, const uint8_t pui8Data[4]);
 uint8_t ST25TB_Initiator_CMD_CONFIRMED_Write_Block(const uint8_t ui8BlockIdx, const uint8_t pui8Data[4]);
 
-uint8_t ST25TB_Initiator_Initiate_Select_UID(uint8_t pui8Data[8])
+uint8_t ST25TB_Initiator_Initiate_Select_UID_C1_C2(uint8_t UID[8], uint8_t C1[4], uint8_t C2[4])
 {
     uint8_t BP_IrqSource, ui8ChipId;
 
     BP_IrqSource = ST25TB_Initiator_CMD_Initiate(&ui8ChipId);
     if(BP_IrqSource == IRQ_SOURCE_NONE)
     {
+
         BP_IrqSource = ST25TB_Initiator_CMD_Select(ui8ChipId);
-        if(BP_IrqSource == IRQ_SOURCE_NONE)
+        if(UID && (BP_IrqSource == IRQ_SOURCE_NONE))
         {
-            BP_IrqSource = ST25TB_Initiator_CMD_CONFIRMED_Get_Uid(pui8Data);
+            BP_IrqSource = ST25TB_Initiator_CMD_CONFIRMED_Get_Uid(UID);
+        }
+
+        if(C1 && (BP_IrqSource == IRQ_SOURCE_NONE))
+        {
+            BP_IrqSource = ST25TB_Initiator_CMD_CONFIRMED_Read_Block(ST25TB_IDX_COUNTER1, C1);
+        }
+
+        if(C2 && (BP_IrqSource == IRQ_SOURCE_NONE))
+        {
+            BP_IrqSource = ST25TB_Initiator_CMD_CONFIRMED_Read_Block(ST25TB_IDX_COUNTER2, C2);
         }
 
         ST25TB_Initiator_CMD_Completion();
@@ -36,7 +47,7 @@ uint8_t ST25TB_Initiator_Initiate_Select_UID(uint8_t pui8Data[8])
     return BP_IrqSource;
 }
 
-uint8_t ST25TB_Initiator_Initiate_Select_Block(uint8_t index, uint8_t pui8Data[4])
+/*uint8_t ST25TB_Initiator_Initiate_Select_Block(uint8_t index, uint8_t pui8Data[4])
 {
     uint8_t BP_IrqSource, ui8ChipId;
 
@@ -53,7 +64,7 @@ uint8_t ST25TB_Initiator_Initiate_Select_Block(uint8_t index, uint8_t pui8Data[4
     }
 
     return BP_IrqSource;
-}
+}*/
 
 uint8_t ST25TB_Initiator_Read_Card()
 {
@@ -93,7 +104,7 @@ uint8_t ST25TB_Initiator_Read_Card()
     return BP_IrqSource;
 }
 
-uint8_t ST25TB_Initiator_Write_Card()
+uint8_t ST25TB_Initiator_Write_Card(uint8_t data[SLOTS_ST25TB_SECTORS_INTERNAL][4])
 {
     uint8_t BP_IrqSource, ui8ChipId, ui8UID[8], i, nbSectors;
 
@@ -107,7 +118,7 @@ uint8_t ST25TB_Initiator_Write_Card()
             if(BP_IrqSource == IRQ_SOURCE_NONE)
             {
                 nbSectors = ST25TB_Initiator_ValidateAndGetNBSectorsFromUID(ui8UID);
-                if (nbSectors && ((*(uint64_t*) ui8UID) == (*(uint64_t*) SLOTS_ST25TB_Current[SLOTS_ST25TB_INDEX_UID]))) // implicit check of same size/techno :')
+                if (nbSectors && ((*(uint64_t*) ui8UID) == (*(uint64_t*) data[SLOTS_ST25TB_INDEX_UID]))) // implicit check of same size/techno :')
                 {
                     for(i = 0; (i < nbSectors) && (BP_IrqSource == IRQ_SOURCE_NONE); i++)
                     {
@@ -117,12 +128,12 @@ uint8_t ST25TB_Initiator_Write_Card()
                             continue;
                         }
 #endif
-                        BP_IrqSource = ST25TB_Initiator_CMD_CONFIRMED_Write_Block(i, SLOTS_ST25TB_Current[i]);
+                        BP_IrqSource = ST25TB_Initiator_CMD_CONFIRMED_Write_Block(i, data[i]);
                     }
 #if !defined(ST25TB_DO_NOT_WRITE_DANGEROUS_SECTOR)
                     if(BP_IrqSource == IRQ_SOURCE_NONE)
                     {
-                        BP_IrqSource = ST25TB_Initiator_CMD_CONFIRMED_Write_Block(ST25TB_IDX_SYSTEM, SLOTS_ST25TB_Current[SLOTS_ST25TB_INDEX_SYSTEM]);
+                        BP_IrqSource = ST25TB_Initiator_CMD_CONFIRMED_Write_Block(ST25TB_IDX_SYSTEM, data[SLOTS_ST25TB_INDEX_SYSTEM]);
                     }
 #endif
                 }
@@ -400,4 +411,67 @@ uint8_t ST25TB_Initiator_CMD_CONFIRMED_Write_Block(const uint8_t ui8BlockIdx, co
     }
 
     return ret;
+}
+
+uint8_t ST25TB_Initiator_CMD_Write_Block_noflush_notimer(const uint8_t ui8BlockIdx, const uint8_t pui8Data[4])
+{
+    uint8_t ret, ST25TB_Initiator_CMD_Write_Block_data[2 + 4] = { ST25TB_CMD_WRITE_BLOCK, ui8BlockIdx };
+    *(uint32_t *) (ST25TB_Initiator_CMD_Write_Block_data + 2) = *((uint32_t *) pui8Data);
+
+    TRF7970A_SPI_Write_Packet(ST25TB_Initiator_CMD_Write_Block_data, sizeof(ST25TB_Initiator_CMD_Write_Block_data));
+
+    g_irq_TRF = TRF_IRQ_READ();
+    while(!g_irq_TRF)
+    {
+        __low_power_mode_0();
+    }
+    g_irq_TRF = false;
+
+    /*
+    if(TRF7970A_SPI_waitIrq() & TRF79X0_IRQ_STATUS_TX)
+    {*/
+        ret = IRQ_SOURCE_NONE;
+    /*}
+    else
+    {
+        ret = IRQ_SOURCE_TRF7970A;
+    }*/
+
+    return ret;
+}
+
+uint8_t ST25TB_Initiator_Initiate_Select_ultra_Write_Block(const uint8_t ui8BlockIdx, const uint8_t pui8Data[4])
+{
+    uint8_t BP_IrqSource, ui8ChipId;
+
+    BP_IrqSource = ST25TB_Initiator_CMD_Initiate(&ui8ChipId);
+    if(BP_IrqSource == IRQ_SOURCE_NONE)
+    {
+        BP_IrqSource = ST25TB_Initiator_CMD_Select(ui8ChipId);
+        if(BP_IrqSource == IRQ_SOURCE_NONE)
+        {
+            BP_IrqSource = ST25TB_Initiator_CMD_Write_Block_noflush_notimer(ui8BlockIdx, pui8Data);
+        }
+    }
+
+    return BP_IrqSource;
+}
+
+uint8_t ST25TB_Initiator_Initiate_Select_quick_Block_with_Reset(const uint8_t ui8BlockIdx, uint8_t pui8Data[4])
+{
+    uint8_t BP_IrqSource, ui8ChipId;
+
+    BP_IrqSource = ST25TB_Initiator_CMD_Initiate(&ui8ChipId);
+    if(BP_IrqSource == IRQ_SOURCE_NONE)
+    {
+        BP_IrqSource = ST25TB_Initiator_CMD_Select(ui8ChipId);
+        if(BP_IrqSource == IRQ_SOURCE_NONE)
+        {
+            BP_IrqSource = ST25TB_Initiator_CMD_Read_Block(ui8BlockIdx, pui8Data);
+        }
+
+        ST25TB_Initiator_CMD_Reset_To_Inventory();
+    }
+
+    return BP_IrqSource;
 }

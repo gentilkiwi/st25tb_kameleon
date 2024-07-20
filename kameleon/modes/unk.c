@@ -19,7 +19,7 @@ void MODE_unk()
         if(BP_IrqSource & IRQ_SOURCE_TIMER)
         {
             LED_ON(LED_INDEX_STATUS_BLUE);
-            BP_IrqSource = ST25TB_Initiator_Initiate_Select_Block(ST25TB_IDX_COUNTER1, Counter1);
+            BP_IrqSource = ST25TB_Initiator_Initiate_Select_UID_C1_C2(NULL, Counter1, NULL);
             LED_OFF(LED_INDEX_STATUS_BLUE);
 
             if(BP_IrqSource == IRQ_SOURCE_NONE)

@@ -11,7 +11,7 @@
 
 #include "slots.h"
 #include "leds.h"
-#include "modes.h"
+
 #include "trf7970a.h"
 
 typedef struct _GLOBAL_SETTINGS {

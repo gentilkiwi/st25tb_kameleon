@@ -16,7 +16,7 @@ void MODE_rewrite()
         if(BP_IrqSource & IRQ_SOURCE_TIMER)
         {
             LED_ON(LED_INDEX_STATUS_BLUE);
-            BP_IrqSource = ST25TB_Initiator_Write_Card(); // avoid dangerous area with ST25TB_DO_NOT_WRITE_DANGEROUS_SECTOR
+            BP_IrqSource = ST25TB_Initiator_Write_Current_Card(); // avoid dangerous area with ST25TB_DO_NOT_WRITE_DANGEROUS_SECTOR
             LED_OFF(LED_INDEX_STATUS_BLUE);
 
             if(BP_IrqSource == IRQ_SOURCE_NONE)

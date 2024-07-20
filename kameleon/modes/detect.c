@@ -20,7 +20,7 @@ void MODE_detect()
         if(BP_IrqSource & IRQ_SOURCE_TIMER)
         {
             LED_ON(LED_INDEX_STATUS_BLUE);
-            BP_IrqSource = ST25TB_Initiator_Initiate_Select_UID(UID);
+            BP_IrqSource = ST25TB_Initiator_Initiate_Select_UID_C1_C2(UID, NULL, NULL);
             LED_OFF(LED_INDEX_STATUS_BLUE);
 
             if(BP_IrqSource == IRQ_SOURCE_NONE)
