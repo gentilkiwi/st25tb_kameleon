@@ -32,13 +32,23 @@
  */
 #define SLOTS_ST25TB_COUNT  8
 
+/* ST25TB Private slots
+ * I push my private includes here, as I don't know how to make #include based on file presence (like in CMakeLists.txt) for _piko
+ * You can ignore them, or adapt to your(s)
+ */
+//#define SLOT_0_CONTENT "private_slots/slot0.h"
+//#define SLOT_1_CONTENT "private_slots/slot1.h"
+//#define SLOT_2_CONTENT "private_slots/slot2.h"
+//#define SLOT_3_CONTENT "private_slots/slot3.h"
+//#define SLOT_4_CONTENT "private_slots/slot4.h"
+//#define SLOT_5_CONTENT "private_slots/slot5.h"
+//#define SLOT_6_CONTENT "private_slots/slot6.h"
+//#define SLOT_7_CONTENT "private_slots/slot7.h"
+
 #define SLOTS_ST25TB_INDEX_SYSTEM   (SLOTS_ST25TB_SECTORS_INTERNAL - 3)
 #define SLOTS_ST25TB_INDEX_UID      (SLOTS_ST25TB_SECTORS_INTERNAL - 2)
 #define SLOTS_ST25TB_INDEX_UID_2    (SLOTS_ST25TB_SECTORS_INTERNAL - 1)
 
-
-/* SLOTS_ST25TB_PERSISTENT_DATA has attribute PERSISTENT in C file */
-extern uint8_t SLOTS_ST25TB_PERSISTENT_DATA[SLOTS_ST25TB_COUNT][SLOTS_ST25TB_SECTORS_INTERNAL][4];
 extern uint8_t SLOTS_ST25TB_Current[SLOTS_ST25TB_SECTORS_INTERNAL][4];
 
 void SLOTS_Change(uint8_t index);
@@ -48,4 +58,15 @@ void SLOTS_Save(uint8_t index);
 #define SLOTS_FIND_INVALID_INDEX    0xff
 uint8_t SLOTS_FindByUID(uint8_t pui8Data[8]); // ret == SLOTS_FIND_INVALID_INDEX -> not found
 
-#define SLOTS_Save_Current()        SLOTS_Save(Settings.CurrentSlot)
+#define SLOTS_Load_Current()        SLOTS_Load(FlashStoredData.CurrentSlot)
+#define SLOTS_Save_Current()        SLOTS_Save(FlashStoredData.CurrentSlot)
+
+typedef struct _FLASH_STORED_DATA {
+    uint32_t CurrentSlot : 3;
+    uint32_t Reserved : 29;
+
+    uint8_t Slots[SLOTS_ST25TB_COUNT][SLOTS_ST25TB_SECTORS_INTERNAL][4];
+} FLASH_STORED_DATA, *PFLASH_STORED_DATA;
+
+/* FlashStoredData has attribute PERSISTENT in C file */
+extern /*const */FLASH_STORED_DATA FlashStoredData;

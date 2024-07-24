@@ -20,5 +20,5 @@ uint8_t ST25TB_Initiator_Read_Card();
 uint8_t ST25TB_Initiator_Write_Card(uint8_t data[SLOTS_ST25TB_SECTORS_INTERNAL][4]);
 #define ST25TB_Initiator_Write_Current_Card()   ST25TB_Initiator_Write_Card(SLOTS_ST25TB_Current)
 
+uint8_t ST25TB_Initiator_Initiate_Select_Read_Block(const uint8_t ui8BlockIdx, uint8_t pui8Data[4]);
 uint8_t ST25TB_Initiator_Initiate_Select_ultra_Write_Block(const uint8_t ui8BlockIdx, const uint8_t pui8Data[4]);
-uint8_t ST25TB_Initiator_Initiate_Select_quick_Block_with_Reset(const uint8_t ui8BlockIdx, uint8_t pui8Data[4]);

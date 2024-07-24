@@ -1,6 +1,7 @@
 .ccsproject
 .launches/
 .settings/
+kameleon/private_*
 targetConfigs/
 Release*/
 Debug*/

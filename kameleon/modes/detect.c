@@ -41,6 +41,6 @@ void MODE_detect()
 
     if(index == SLOTS_FIND_INVALID_INDEX)
     {
-        LED_Slot(Settings.CurrentSlot);
+        LED_Slot(FlashStoredData.CurrentSlot);
     }
 }

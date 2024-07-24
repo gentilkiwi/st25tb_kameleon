@@ -56,7 +56,7 @@ void Dispatch_14a_NTAG210(const uint8_t **ppcbData, uint8_t *pcbData)
         if(g_ui8_cb14a_Buffer == 2)
         {
             addr = g_ui8_14a_Buffer[1];
-            if(addr < (sizeof(NTAG210_DATA) / sizeof(NTAG210_DATA[0])))
+            if(addr < count_of(NTAG210_DATA))
             {
                 *ppcbData = NTAG210_DATA[addr];
                 *pcbData = 16; // ouch, TODO: FIX rollover, or not.... I pushed data after DATA

@@ -8,11 +8,10 @@
 
 /** 'A' settings
  ** at the beginning, ST25TB kameleon was only to emulate/play with ST25TB technology
- ** but at one point, I wanted to play with 'A' emulation and the TRF (spoiler alert: it sucks)
- **
+ ** but at one point, I wanted to play with 'A' emulation and the TRF (spoiler alert: it sucks - do not enable or use it)
  **/
-//#define ST25TB_SUPPORT_A_NTAG210
-//#define ST25TB_SUPPORT_A_ST25TA512
+#define ST25TB_SUPPORT_A_NTAG210
+#define ST25TB_SUPPORT_A_ST25TA512
 
 typedef void (* const PDISPATCH_14A_ROUTINE) (const uint8_t **ppcbData, uint8_t *pcbData);
 

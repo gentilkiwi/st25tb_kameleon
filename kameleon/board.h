@@ -11,23 +11,18 @@
 
 #include "slots.h"
 #include "leds.h"
-
 #include "trf7970a.h"
-
-typedef struct _GLOBAL_SETTINGS {
-    uint8_t CurrentSlot;
-} GLOBAL_SETTINGS, *PGLOBAL_SETTINGS;
-
-extern GLOBAL_SETTINGS Settings;
 
 extern volatile bool g_irq_TA0, g_irq_SW1, g_irq_SW2, g_irq_TRF;
 
 void BOARD_init();
 
+uint16_t RAND_Generate();
+
 #define TIMER_stop()                    TA0CTL &= ~(TAIE | MC)
-#define TIMER_delay_Milliseconds(n_ms)  TIMER_delay_Milliseconds_internal(n_ms * 33)
-#define TIMER_start_Milliseconds(n_ms)  TIMER_start_Milliseconds_internal(n_ms * 33)
-#define TIMER_delay_Microseconds(n_us)  TIMER_delay_Microseconds_internal(n_us * 2)
+#define TIMER_delay_Milliseconds(n_ms)  TIMER_delay_Milliseconds_internal((n_ms) * 33)
+#define TIMER_start_Milliseconds(n_ms)  TIMER_start_Milliseconds_internal((n_ms) * 33)
+#define TIMER_delay_Microseconds(n_us)  TIMER_delay_Microseconds_internal((n_us) * 2)
 
 void TIMER_delay_Milliseconds_internal(uint16_t n_unit_ms); // max is UINT16_MAX ( 1985 ms * 33 = ~ UINT16_MAX )
 void TIMER_start_Milliseconds_internal(uint16_t n_unit_ms); // max is UINT16_MAX ( 1985 ms * 33 = ~ UINT16_MAX )
@@ -59,4 +54,3 @@ uint8_t IRQ_Wait_for_SW1_or_SW2_or_TRF_or_Timeout(uint8_t *pTRF7970A_irqStatus, 
 #define TRF_IRQ_IFG     P2IFG
 #define TRF_IRQ_IE      P2IE
 #define TRF_IRQ_BIT     BIT1
-

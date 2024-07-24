@@ -32,7 +32,7 @@ void main(void)
     BOARD_init();
     TRF7970A_init();
     LEDS_Animation();
-    SLOTS_Change(Settings.CurrentSlot);
+    SLOTS_Change(FlashStoredData.CurrentSlot);
 
     if(P1IN & BIT4) // 14A Modes and LEARN only available if pushing MODE at startup
     {

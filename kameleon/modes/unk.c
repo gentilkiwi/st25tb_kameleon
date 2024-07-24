@@ -46,5 +46,5 @@ void MODE_unk()
     }
     while (!(BP_IrqSource & IRQ_SOURCE_SW1));
 
-    LED_Slot(Settings.CurrentSlot);
+    LED_Slot(FlashStoredData.CurrentSlot);
 }

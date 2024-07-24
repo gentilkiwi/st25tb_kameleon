@@ -7,7 +7,7 @@
 
 void MODE_learn()
 {
-    uint8_t BP_IrqSource, index = Settings.CurrentSlot;
+    uint8_t BP_IrqSource, index = FlashStoredData.CurrentSlot;
     bool bNeedToReload = false;
 
     ST25TB_TRF7970A_Mode(true);
@@ -52,6 +52,6 @@ void MODE_learn()
 
     if(bNeedToReload)
     {
-        SLOTS_Load(Settings.CurrentSlot);
+        SLOTS_Load_Current();
     }
 }

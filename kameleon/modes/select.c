@@ -7,7 +7,7 @@
 
 void MODE_select()
 {
-    uint8_t BP_IrqSource, index = Settings.CurrentSlot;
+    uint8_t BP_IrqSource, index = FlashStoredData.CurrentSlot;
 
     do
     {

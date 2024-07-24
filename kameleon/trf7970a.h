@@ -110,12 +110,13 @@ uint8_t TRF7970A_SPI_waitIrq();
 //*****************************************************************************
 #define TRF79X0_ISO_CONTROL_RX_CRC_N        0x80
 #define TRF79X0_ISO_CONTROL_DIR_MODE        0x40
+#define TRF79X0_ISO_NFC_OR_CARD_EMULATION_MODE  0x20 // 6.15.3.1.2
 #define TRF79X0_ISO_NFC_TARGET              0x00
 #define TRF79X0_ISO_NFC_INITIATOR           0x10
 #define TRF79X0_NFC_PASSIVE_MODE            0x00
 #define TRF79X0_NFC_ACTIVE_MODE             0x08
 #define TRF79X0_NFC_NORMAL_MODE             0x00
-#define TRF79X0_NFC_CARD_EMULATION_MODE     0x40
+#define TRF79X0_NFC_CARD_EMULATION_MODE     0x04 // Fixed from 6.15.3.1.2
 #define TRF79X0_ISO_CONTROL_14443A_106K     0x08
 
 //*****************************************************************************

@@ -61,9 +61,9 @@ void TRF7970A_SPI_Write_SingleRegister_internal(uint8_t Register_Prepared, const
     TRF_CS_ENABLE();
     TRF_SPI_SEND(Register_Prepared);
     TRF_SPI_SEND(Value);
+
     TRF_CS_DISABLE();
 }
-
 
 void TRF7970A_SPI_Read_ContinuousRegister_internal(uint8_t Register_Prepared, uint8_t *pbData, uint8_t cbData)
 {

@@ -7,11 +7,6 @@
 
 volatile bool g_irq_TA0, g_irq_SW1, g_irq_SW2, g_irq_TRF;
 
-#pragma PERSISTENT(Settings)
-GLOBAL_SETTINGS Settings = {
-    .CurrentSlot = 0,
-};
-
 void BOARD_init()
 {
     WDTCTL = WDTPW | WDTHOLD;
@@ -96,6 +91,13 @@ void BOARD_init()
     UCB1CTLW0 &= ~UCSWRST;
 }
 
+uint16_t lfsr = 0xcafe, bit;
+uint16_t RAND_Generate()
+{
+    bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
+    return lfsr = (lfsr >> 1) | (bit << 15);
+}
+
 void TIMER_delay_Milliseconds_internal(uint16_t n_unit_ms) // max is UINT16_MAX ( 1985 ms * 33 = ~ UINT16_MAX )
 {
     TA0CCR0 = n_unit_ms;
@@ -150,7 +152,6 @@ uint8_t IRQ_Wait_for_SW1_or_SW2()
 
     g_irq_SW1 = false;
     g_irq_SW2 = false;
-
     while(!g_irq_SW1 && !g_irq_SW2)
     {
        __low_power_mode_0();
@@ -177,7 +178,6 @@ uint8_t IRQ_Wait_for_SW1_or_SW2_or_TRF(uint8_t *pTRF7970A_irqStatus)
 
     g_irq_SW1 = false;
     g_irq_SW2 = false;
-
     g_irq_TRF = TRF_IRQ_READ();
     while(!g_irq_TRF && !g_irq_SW1 && !g_irq_SW2)
     {
@@ -211,7 +211,6 @@ uint8_t IRQ_Wait_for_SW1_or_TRF(uint8_t *pTRF7970A_irqStatus)
     uint8_t ret = IRQ_SOURCE_NONE;
 
     g_irq_SW1 = false;
-
     g_irq_TRF = TRF_IRQ_READ();
     while(!g_irq_TRF && !g_irq_SW1)
     {
@@ -240,7 +239,6 @@ uint8_t IRQ_Wait_for_SW1_or_SW2_or_Timeout(uint16_t timeout_ms)
 
     g_irq_SW1 = false;
     g_irq_SW2 = false;
-
     TIMER_start_Milliseconds(timeout_ms);
     while(!g_irq_TA0 && !g_irq_SW1 && !g_irq_SW2)
     {
@@ -274,7 +272,6 @@ uint8_t IRQ_Wait_for_SW1_or_SW2_or_TRF_or_Timeout(uint8_t *pTRF7970A_irqStatus, 
 
     g_irq_SW1 = false;
     g_irq_SW2 = false;
-
     TIMER_start_Milliseconds(timeout_ms);
     g_irq_TRF = TRF_IRQ_READ();
     while(!g_irq_TRF && !g_irq_TA0 && !g_irq_SW1 && !g_irq_SW2)

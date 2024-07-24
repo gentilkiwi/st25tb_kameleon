@@ -81,5 +81,5 @@ void MODE_emulate_14_generic(const T3A_INFOS *pt3a_infos, const PDISPATCH_14A_RO
     }
     while (!bExitMode);
 
-    LED_Slot(Settings.CurrentSlot);
+    LED_Slot(FlashStoredData.CurrentSlot);
 }

@@ -20,13 +20,13 @@ extern const LED LEDS[];
 #define LEDS_STATUS     LEDS_SLOTS + NB_LEDS_SLOTS
 #define NB_LEDS_STATUS  3
 
+// No LEDS_Init(), handled in board.c
 void LEDS_Bitmask(const LED *LEDS_ARRAY, const uint8_t nbLeds, uint8_t bitmask);
+void LEDS_Animation();
 
 #define LEDS_MODES_Bitmask(bitmask) LEDS_Bitmask(LEDS_MODES, NB_LEDS_MODES, bitmask)
 #define LEDS_SLOTS_Bitmask(bitmask) LEDS_Bitmask(LEDS_SLOTS, NB_LEDS_SLOTS, bitmask)
 #define LEDS_STATUS_Bitmask(bitmask) LEDS_Bitmask(LEDS_STATUS, NB_LEDS_STATUS, bitmask)
-
-void LEDS_Animation();
 
 #define LED_Slot(index) LEDS_SLOTS_Bitmask(1 << index)
 
@@ -34,10 +34,10 @@ void LEDS_Animation();
 #define LED_INDEX_STATUS_GREEN      NB_LEDS_MODES + NB_LEDS_SLOTS + 1
 #define LED_INDEX_STATUS_RED        NB_LEDS_MODES + NB_LEDS_SLOTS + 2
 
-#define LED_ON_internal(p, b)       *p |= b
-#define LED_OFF_internal(p, b)      *p &= ~b
-#define LED_TOGGLE_internal(p, b)   *p ^= b
-
 #define LED_ON(index)                LED_ON_internal(LEDS[index].portOutput, LEDS[index].bit)
 #define LED_OFF(index)               LED_OFF_internal(LEDS[index].portOutput, LEDS[index].bit)
 #define LED_TOGGLE(index)            LED_TOGGLE_internal(LEDS[index].portOutput, LEDS[index].bit)
+
+#define LED_ON_internal(p, b)       *p |= b
+#define LED_OFF_internal(p, b)      *p &= ~b
+#define LED_TOGGLE_internal(p, b)   *p ^= b
