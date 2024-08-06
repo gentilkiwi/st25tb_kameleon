@@ -2,6 +2,7 @@
 .launches/
 .settings/
 kameleon/private_*
+kameleon/*.data
 targetConfigs/
 Release*/
 Debug*/

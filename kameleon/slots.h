@@ -36,14 +36,14 @@
  * I push my private includes here, as I don't know how to make #include based on file presence (like in CMakeLists.txt) for _piko
  * You can ignore them, or adapt to your(s)
  */
-//#define SLOT_0_CONTENT "private_slots/slot0.h"
-//#define SLOT_1_CONTENT "private_slots/slot1.h"
-//#define SLOT_2_CONTENT "private_slots/slot2.h"
-//#define SLOT_3_CONTENT "private_slots/slot3.h"
-//#define SLOT_4_CONTENT "private_slots/slot4.h"
-//#define SLOT_5_CONTENT "private_slots/slot5.h"
-//#define SLOT_6_CONTENT "private_slots/slot6.h"
-//#define SLOT_7_CONTENT "private_slots/slot7.h"
+//#define SLOT_0_CONTENT "private_data/slot0.cnt"
+//#define SLOT_1_CONTENT "private_data/slot1.cnt"
+//#define SLOT_2_CONTENT "private_data/slot2.cnt"
+//#define SLOT_3_CONTENT "private_data/slot3.cnt"
+//#define SLOT_4_CONTENT "private_data/slot4.cnt"
+//#define SLOT_5_CONTENT "private_data/slot5.cnt"
+//#define SLOT_6_CONTENT "private_data/slot6.cnt"
+//#define SLOT_7_CONTENT "private_data/slot7.cnt"
 
 #define SLOTS_ST25TB_INDEX_SYSTEM   (SLOTS_ST25TB_SECTORS_INTERNAL - 3)
 #define SLOTS_ST25TB_INDEX_UID      (SLOTS_ST25TB_SECTORS_INTERNAL - 2)
